@@ -147,8 +147,17 @@ const Chat = () => {
     setDidStopped(true);
   };
 
-  const handleListenStart = () => {
-    SpeechRecognition.startListening(speechOpts);
+  const handleListenStart = async () => {
+    try {
+      // Request microphone permission using the WebRTC API.
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  
+      // Permission granted, you can now start listening.
+      SpeechRecognition.startListening(speechOpts);
+    } catch (error) {
+      // Permission denied or an error occurred.
+      console.error('Error accessing the microphone:', error);
+    }
   };
 
   return (
