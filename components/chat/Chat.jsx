@@ -53,8 +53,11 @@ const Chat = () => {
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [lang, setLanguage] = React.useState("bn");
 
-  const { transcript, resetTranscript, finalTranscript, listening } = useSpeechRecognition();
-
+  const { transcript, resetTranscript,isMicrophoneAvailable,browserSupportsContinuousListening, finalTranscript, listening } = useSpeechRecognition();
+  
+  if (!isMicrophoneAvailable) {
+    alert("microphone is not available")
+  }
   useEffect(() => {
     if (listening === false) {
       if (transcript && !didstopped) {
@@ -149,17 +152,22 @@ const Chat = () => {
 
   const handleListenStart = async () => {
     try {
-      // Request microphone permission using the WebRTC API.
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (browserSupportsContinuousListening) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
   
       // Permission granted, you can now start listening.
       SpeechRecognition.startListening(speechOpts);
+      } else {
+        alert("browser not support")
+      }
+      // Request microphone permission using the WebRTC API.
+      
     } catch (error) {
       // Permission denied or an error occurred.
       console.error('Error accessing the microphone:', error);
     }
   };
-
+console.log('microphon',isMicrophoneAvailable)
   return (
     <div className={Styles.container}>
       {open ? (
@@ -168,7 +176,7 @@ const Chat = () => {
             SENSEBOT <div className={Styles.sub}>Try out now</div>
           </div>
           <div className={Styles.chatMessage} ref={boxRef}>
-
+          <h1>{isMicrophoneAvailable}</h1>
             {messages.map((msg) => {
               return (
                 <div className={msg.type === 0 ? Styles.sentMessage : Styles.receivedMessage} key={msg.id}>
